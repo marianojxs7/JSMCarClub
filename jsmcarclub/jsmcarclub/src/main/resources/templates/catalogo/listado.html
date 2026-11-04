@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Catálogo | JSMCarClub</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background: #101010;
+        }
+
+        .navbar-brand {
+            color: #d4af37 !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .gold {
+            color: #c5a028;
+        }
+
+        .catalog-header {
+            background: #151515;
+            color: white;
+            padding: 55px 0;
+        }
+
+        .filter-box {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 3px 15px rgba(0,0,0,.06);
+        }
+
+        .vehicle-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: .25s;
+            height: 100%;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,.12);
+        }
+
+        .vehicle-image {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+            background: #e5e5e5;
+        }
+
+        .premium-label {
+            background: linear-gradient(135deg, #f5df8b, #c5a028);
+            color: #171717;
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .btn-gold {
+            background: #d4af37;
+            color: #111;
+            font-weight: bold;
+            border: none;
+        }
+
+        .btn-gold:hover {
+            background: #b89528;
+            color: #111;
+        }
+
+        .vehicle-price {
+            font-size: 21px;
+            font-weight: bold;
+            color: #b18b19;
+        }
+
+        footer {
+            background: #101010;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+
+        <a class="navbar-brand" th:href="@{/}">
+            JSMCARCLUB
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menu">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/catalogo}">Vehículos</a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</nav>
+
+<header class="catalog-header">
+    <div class="container">
+        <p class="gold fw-bold mb-2">JSMCARCLUB</p>
+        <h1 class="fw-bold">Nuestro catálogo</h1>
+        <p class="text-light mb-0">
+            Descubre vehículos seleccionados para encontrar tu próximo automóvil.
+        </p>
+    </div>
+</header>
+
+<main class="container py-5">
+
+    <!-- FILTROS -->
+
+    <form th:action="@{/catalogo}" method="get"
+          class="filter-box mb-5">
+
+        <h5 class="fw-bold mb-3">Encuentra tu vehículo</h5>
+
+        <div class="row g-3">
+
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label">Buscar</label>
+                <input type="text" name="buscar"
+                       class="form-control"
+                       placeholder="Marca o modelo"
+                       th:value="${buscar}">
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label">Marca</label>
+                <select name="marcaId" class="form-select">
+                    <option value="">Todas</option>
+                    <option th:each="marca : ${marcas}"
+                            th:value="${marca.id}"
+                            th:text="${marca.nombre}"
+                            th:selected="${marcaId != null and marcaId.equals(marca.id)}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label">Tipo</label>
+                <select name="tipoId" class="form-select">
+                    <option value="">Todos</option>
+                    <option th:each="tipo : ${tipos}"
+                            th:value="${tipo.id}"
+                            th:text="${tipo.nombre}"
+                            th:selected="${tipoId != null and tipoId.equals(tipo.id)}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label">Precio mínimo</label>
+                <input type="number" name="precioMin"
+                       class="form-control"
+                       placeholder="₡ Mínimo"
+                       min="0"
+                       th:value="${precioMin}">
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label">Precio máximo</label>
+                <input type="number" name="precioMax"
+                       class="form-control"
+                       placeholder="₡ Máximo"
+                       min="0"
+                       th:value="${precioMax}">
+            </div>
+
+            <div class="col-lg-1 col-md-6 d-flex align-items-end">
+                <button type="submit" class="btn btn-gold w-100">
+                    Filtrar
+                </button>
+            </div>
+
+        </div>
+
+        <div class="mt-3">
+            <a th:href="@{/catalogo}"
+               class="text-secondary small">
+                Limpiar filtros
+            </a>
+        </div>
+
+    </form>
+
+    <!-- RESULTADOS -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h3 class="fw-bold mb-1">Vehículos disponibles</h3>
+            <p class="text-secondary mb-0">
+                Explora nuestra selección.
+            </p>
+        </div>
+
+        <span class="badge text-bg-dark"
+              th:text="${#lists.size(vehiculos)} + ' vehículos'">
+            0 vehículos
+        </span>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-6 col-lg-4"
+             th:each="vehiculo : ${vehiculos}">
+
+            <div class="card vehicle-card shadow-sm">
+
+                <div class="position-relative">
+
+                    <img class="vehicle-image"
+                         th:if="${portadas.containsKey(vehiculo.id)}"
+                         th:src="${portadas.get(vehiculo.id)}"
+                         th:alt="${vehiculo.marca.nombre + ' ' + vehiculo.modelo}">
+
+                    <div class="vehicle-image d-flex align-items-center justify-content-center"
+                         th:unless="${portadas.containsKey(vehiculo.id)}">
+                        <span class="text-secondary">
+                            Fotografía próximamente
+                        </span>
+                    </div>
+
+                    <span class="premium-label position-absolute top-0 end-0 m-3"
+                          th:if="${vehiculo.premium}">
+                        ★ PREMIUM
+                    </span>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <p class="text-secondary small mb-1"
+                       th:text="${vehiculo.marca.nombre}">
+                        Marca
+                    </p>
+
+                    <h5 class="fw-bold"
+                        th:text="${vehiculo.modelo}">
+                        Modelo
+                    </h5>
+
+                    <div class="d-flex flex-wrap gap-2 my-3">
+
+                        <span class="badge text-bg-light"
+                              th:text="${vehiculo.anio}">
+                            Año
+                        </span>
+
+                        <span class="badge text-bg-light"
+                              th:text="${#numbers.formatInteger(vehiculo.kilometraje, 1, 'COMMA')} + ' km'">
+                            Kilometraje
+                        </span>
+
+                        <span class="badge text-bg-light"
+                              th:text="${vehiculo.transmision.nombre}">
+                            Transmisión
+                        </span>
+
+                    </div>
+
+                    <p class="vehicle-price mb-3"
+                       th:text="${'₡' + #numbers.formatDecimal(vehiculo.precio, 1, 'COMMA', 0, 'POINT')}">
+                        Precio
+                    </p>
+
+                    <a th:href="@{/vehiculo/{id}(id=${vehiculo.id})}"
+                       class="btn btn-dark w-100">
+                        Ver detalles
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-12"
+             th:if="${#lists.isEmpty(vehiculos)}">
+
+            <div class="text-center bg-white rounded-3 p-5">
+
+                <h4>No encontramos vehículos</h4>
+
+                <p class="text-secondary">
+                    Intenta modificar los filtros de búsqueda.
+                </p>
+
+                <a th:href="@{/catalogo}" class="btn btn-gold">
+                    Ver todos los vehículos
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<footer class="py-4 mt-5">
+    <div class="container text-center">
+        <h5 class="gold fw-bold">JSMCARCLUB</h5>
+        <p class="mb-1">Encuentra tu próximo vehículo con nosotros.</p>
+        <small class="text-secondary">
+            © 2026 JSMCarClub. Todos los derechos reservados.
+        </small>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+</body>
+</html>

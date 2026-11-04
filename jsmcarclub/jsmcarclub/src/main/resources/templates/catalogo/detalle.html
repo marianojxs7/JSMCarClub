@@ -1,0 +1,342 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Detalle del vehículo | JSMCarClub</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar, footer {
+            background: #101010;
+        }
+
+        .navbar-brand, .gold {
+            color: #d4af37 !important;
+            font-weight: bold;
+        }
+
+        .vehicle-title {
+            font-weight: bold;
+            font-size: 32px;
+        }
+
+        .vehicle-price {
+            color: #b18b19;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,.06);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 430px;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #e5e5e5;
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .premium-label {
+            background: linear-gradient(135deg, #f5df8b, #c5a028);
+            color: #171717;
+            padding: 7px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .btn-gold {
+            background: #d4af37;
+            color: #111;
+            font-weight: bold;
+            border: none;
+        }
+
+        .btn-gold:hover {
+            background: #b89528;
+            color: #111;
+        }
+
+        .specification {
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 8px;
+            height: 100%;
+        }
+
+        .specification small {
+            color: #777;
+        }
+
+        .specification strong {
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+
+        <a class="navbar-brand" th:href="@{/}">
+            JSMCARCLUB
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menu">
+
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Inicio</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/catalogo}">Vehículos</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<main class="container py-5">
+
+    <div class="mb-4">
+        <a th:href="@{/catalogo}"
+           class="text-decoration-none text-secondary">
+            ← Volver al catálogo
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- GALERÍA -->
+
+        <div class="col-lg-7">
+
+            <div class="detail-card">
+
+                <div th:if="${vehiculo.premium}" class="mb-3">
+                    <span class="premium-label">★ PUBLICACIÓN PREMIUM</span>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(fotografias)}">
+
+                    <img id="imagenPrincipal"
+                         class="main-image"
+                         th:src="${fotografias[0].url}"
+                         th:alt="${vehiculo.modelo}">
+
+                    <div class="row g-2 mt-2">
+
+                        <div class="col-3"
+                             th:each="foto : ${fotografias}">
+
+                            <img class="gallery-image"
+                                 th:src="${foto.url}"
+                                 th:alt="${foto.descripcion}"
+                                 onclick="cambiarImagen(this)">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div th:if="${#lists.isEmpty(fotografias)}"
+                     class="main-image d-flex align-items-center justify-content-center">
+
+                    <span class="text-secondary">
+                        Fotografías próximamente
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- INFORMACIÓN PRINCIPAL -->
+
+        <div class="col-lg-5">
+
+            <div class="detail-card h-100">
+
+                <p class="gold fw-bold mb-2"
+                   th:text="${vehiculo.marca.nombre}">
+                    Marca
+                </p>
+
+                <h1 class="vehicle-title"
+                    th:text="${vehiculo.modelo}">
+                    Modelo
+                </h1>
+
+                <p class="text-secondary"
+                   th:text="${vehiculo.tipoVehiculo.nombre}">
+                    Tipo de vehículo
+                </p>
+
+                <h2 class="vehicle-price my-4"
+                    th:text="${'₡' + #numbers.formatDecimal(vehiculo.precio, 1, 'COMMA', 0, 'POINT')}">
+                    Precio
+                </h2>
+
+                <hr>
+
+                <h5 class="fw-bold mb-3">Información general</h5>
+
+                <div class="row g-3">
+
+                    <div class="col-6">
+                        <div class="specification">
+                            <small>Año</small>
+                            <strong th:text="${vehiculo.anio}">2024</strong>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="specification">
+                            <small>Kilometraje</small>
+                            <strong th:text="${#numbers.formatInteger(vehiculo.kilometraje, 1, 'COMMA')} + ' km'">
+                                20.000 km
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="specification">
+                            <small>Combustible</small>
+                            <strong th:text="${vehiculo.combustible.nombre}">
+                                Gasolina
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="specification">
+                            <small>Transmisión</small>
+                            <strong th:text="${vehiculo.transmision.nombre}">
+                                Automática
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="specification">
+                            <small>Placa</small>
+                            <strong th:text="${vehiculo.placa}">
+                                ABC123
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="col-6">
+                        <div class="specification">
+                            <small>Estado</small>
+                            <strong th:text="${vehiculo.estado}">
+                                Disponible
+                            </strong>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr class="my-4">
+
+                <h5 class="fw-bold">¿Te interesa este vehículo?</h5>
+
+                <p class="text-secondary">
+                    Comunícate directamente con el propietario
+                    para obtener más información.
+                </p>
+
+                <a class="btn btn-gold btn-lg w-100"
+                   th:href="'tel:' + ${vehiculo.telefonoPropietario}">
+                    ☎ Contactar al propietario
+                </a>
+
+                <p class="text-secondary small mt-3 mb-0">
+                    Teléfono:
+                    <strong th:text="${vehiculo.telefonoPropietario}">
+                        00000000
+                    </strong>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- DESCRIPCIÓN -->
+
+    <div class="detail-card mt-4">
+
+        <h4 class="fw-bold mb-3">Descripción del vehículo</h4>
+
+        <p class="text-secondary mb-0"
+           style="white-space: pre-line"
+           th:text="${vehiculo.descripcion != null and !vehiculo.descripcion.isBlank() ? vehiculo.descripcion : 'No hay una descripción disponible para este vehículo.'}">
+            Descripción
+        </p>
+
+    </div>
+
+</main>
+
+<footer class="py-4 mt-5 text-white text-center">
+
+    <h5 class="gold">JSMCARCLUB</h5>
+
+    <p class="mb-1">
+        Encuentra tu próximo vehículo con nosotros.
+    </p>
+
+    <small class="text-secondary">
+        © 2026 JSMCarClub. Todos los derechos reservados.
+    </small>
+
+</footer>
+
+<script>
+    function cambiarImagen(imagen) {
+        document.getElementById("imagenPrincipal").src = imagen.src;
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+</body>
+</html>
